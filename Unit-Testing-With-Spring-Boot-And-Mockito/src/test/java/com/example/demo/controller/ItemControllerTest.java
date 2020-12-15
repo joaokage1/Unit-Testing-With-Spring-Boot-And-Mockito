@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -7,16 +8,23 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.example.demo.controller.business.ItemBusinessService;
+import com.example.demo.model.Item;
 
 @WebMvcTest(ItemController.class)
 public class ItemControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@MockBean
+	private ItemBusinessService service;
 
 	@Test
 	void dummyItemBasicTest() throws Exception {
@@ -28,6 +36,21 @@ public class ItemControllerTest {
 				.andExpect(content().json("{\"id\":1,\"name\":\"Ball\",\"price\":10.0,\"quantity\":100}")).andReturn();
 
 		JSONAssert.assertEquals("{\"id\":1,\"name\":\"Ball\",\"price\":10.0,\"quantity\":100}",
+				result.getResponse().getContentAsString(), false);
+	}
+
+	@Test
+	void dummyItemFromBusinessTest() throws Exception {
+
+		when(this.service.retrieveHardCodedItem()).thenReturn(new Item(2, "Couch", 20.0, 50));
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/dummy-item-from-business-service")
+				.accept(org.springframework.http.MediaType.APPLICATION_JSON);
+
+		MvcResult result = this.mockMvc.perform(requestBuilder).andExpect(status().is(200))
+				.andExpect(content().json("{\"id\":2,\"name\":\"Couch\",\"price\":20.0,\"quantity\":50}")).andReturn();
+
+		JSONAssert.assertEquals("{\"id\":2,\"name\":\"Couch\",\"price\":20.0,\"quantity\":50}",
 				result.getResponse().getContentAsString(), false);
 	}
 

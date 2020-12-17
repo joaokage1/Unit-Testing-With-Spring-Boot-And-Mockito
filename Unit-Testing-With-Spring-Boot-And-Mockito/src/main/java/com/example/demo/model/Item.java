@@ -1,11 +1,20 @@
 package com.example.demo.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
+@Entity
 public class Item {
 
+	@Id
 	private Integer id;
 	private String name;
 	private Double price;
 	private Integer quantity;
+
+	@Transient
+	private int value;
 
 	public Item(Integer id, String name, Double price, Integer quantity) {
 		this.id = id;
@@ -44,6 +53,14 @@ public class Item {
 
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
+	}
+
+	public int getValue() {
+		return this.value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	@Override

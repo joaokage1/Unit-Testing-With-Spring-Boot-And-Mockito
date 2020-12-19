@@ -4,6 +4,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import com.example.demo.model.Item;
 @WebMvcTest(ItemController.class)
 public class ItemControllerTest {
 
+	private static final String OBJECT_TO_RETURN = "{\"id\":2,\"name\":\"Couch\",\"price\":20.0,\"quantity\":50}";
+
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -33,10 +37,9 @@ public class ItemControllerTest {
 				.accept(org.springframework.http.MediaType.APPLICATION_JSON);
 
 		MvcResult result = this.mockMvc.perform(requestBuilder).andExpect(status().is(200))
-				.andExpect(content().json("{\"id\":1,\"name\":\"Ball\",\"price\":10.0,\"quantity\":100}")).andReturn();
+				.andExpect(content().json(OBJECT_TO_RETURN)).andReturn();
 
-		JSONAssert.assertEquals("{\"id\":1,\"name\":\"Ball\",\"price\":10.0,\"quantity\":100}",
-				result.getResponse().getContentAsString(), false);
+		JSONAssert.assertEquals(OBJECT_TO_RETURN, result.getResponse().getContentAsString(), false);
 	}
 
 	@Test
@@ -48,10 +51,24 @@ public class ItemControllerTest {
 				.accept(org.springframework.http.MediaType.APPLICATION_JSON);
 
 		MvcResult result = this.mockMvc.perform(requestBuilder).andExpect(status().is(200))
-				.andExpect(content().json("{\"id\":2,\"name\":\"Couch\",\"price\":20.0,\"quantity\":50}")).andReturn();
+				.andExpect(content().json(OBJECT_TO_RETURN)).andReturn();
 
-		JSONAssert.assertEquals("{\"id\":2,\"name\":\"Couch\",\"price\":20.0,\"quantity\":50}",
-				result.getResponse().getContentAsString(), false);
+		JSONAssert.assertEquals(OBJECT_TO_RETURN, result.getResponse().getContentAsString(), false);
+	}
+
+	@Test
+	void retrieveAllitemsTest() throws Exception {
+		ArrayList<Item> allItems = new ArrayList<>();
+		allItems.add(new Item(2, "Couch", 20.0, 50));
+		when(this.service.retrieveAllItems()).thenReturn(allItems);
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/all-items")
+				.accept(org.springframework.http.MediaType.APPLICATION_JSON);
+
+		MvcResult result = this.mockMvc.perform(requestBuilder).andExpect(status().is(200))
+				.andExpect(content().json("[" + OBJECT_TO_RETURN + "]")).andReturn();
+
+		JSONAssert.assertEquals("[" + OBJECT_TO_RETURN + "]", result.getResponse().getContentAsString(), false);
 	}
 
 }

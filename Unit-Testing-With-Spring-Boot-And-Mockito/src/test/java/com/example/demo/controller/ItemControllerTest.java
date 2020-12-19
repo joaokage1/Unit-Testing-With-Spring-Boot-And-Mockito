@@ -68,7 +68,8 @@ public class ItemControllerTest {
 		MvcResult result = this.mockMvc.perform(requestBuilder).andExpect(status().is(200))
 				.andExpect(content().json("[" + OBJECT_TO_RETURN + "]")).andReturn();
 
-		JSONAssert.assertEquals("[" + OBJECT_TO_RETURN + "]", result.getResponse().getContentAsString(), false);
+		JSONAssert.assertEquals("[" + "{\"id\":2,\"name\":\"Couch\",\"price\":20.0}" + "]",
+				result.getResponse().getContentAsString(), false);
 	}
 
 }
